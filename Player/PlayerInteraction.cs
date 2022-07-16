@@ -10,18 +10,31 @@ public class PlayerInteraction : MonoBehaviour
     [SerializeField] private PlayerUI playerUI;
 
     private Camera playerCam;
+    public InputAction ButtonInteract;
 
-    // Start is called before the first frame update
     void Start()
     {
         playerCam = GetComponent<Camera>();
+        ButtonInteract.Enable();
     }
 
-    // Update is called once per frame
     void Update()
     {
         // Create a ray from the center of the camera
         Ray ray = new Ray(playerCam.transform.position, playerCam.transform.forward);
         RaycastHit hitInfo;
+
+        if (Physics.Raycast(ray, out hitInfo, interactDistance, interactMask.value))
+        {
+            if (hitInfo.collider.GetComponent<Interactable>() != null)
+            {
+                Interactable interactable = hitInfo.collider.GetComponent<Interactable>();
+                playerUI.UpdatePromptText(interactable.promptMessage);
+                if (ButtonInteract.triggered)
+                {
+                    interactable.BaseInteract();
+                }
+            }
+        }
     }
 }
